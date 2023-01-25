@@ -51,9 +51,10 @@ const cardArray = [
 cardArray.sort(() => 0.5 - Math.random());
 
 const gridDisplay = document.querySelector('#grid');
-const cardsChosen = [];
-const cardsChosenIds = [];
-
+const resultDisplay = document.querySelector('#result')
+let cardsChosen = [];
+let cardsChosenIds = [];
+const cardsWon = [];
 
 function createBoard(){
     for(let i = 0; i < cardArray.length; i++){
@@ -65,32 +66,51 @@ function createBoard(){
         gridDisplay.appendChild(card);
     }
 }
+
+// *↓  FUNCTION WORKING ↓
 createBoard();
+// *↑  FUNCTION WORKING ↑
 
 function checkMatch(){
     const cards = document.querySelectorAll('img');
-    console.log(cards);
-    
-    console.log('check for match');
+    const optionOneID = cardsChosenIds[0]
+    const optionTwoID = cardsChosenIds[1]
+
+    if(optionOneID == optionTwoID){
+        cards[optionTwoID].setAttribute('src','images/blank.png')
+        cards[optionOneID].setAttribute('src','images/blank.png')
+        alert('you have clicked the same image');
+    }
+
     if(cardsChosen[0] == cardsChosen[1]){
         alert('you found a match')
-        cards[cardsChosenIds[0]].setAttribute('src','images/white.png')
-        cards[cardsChosenIds[1]].setAttribute('src','images/white.png')
-        cards[cardsChosenIds[0]].removeEventListener('click', flipCard)
-        cards[cardsChosenIds[1]].removeEventListener('click', flipCard)
+        cards[optionTwoID].setAttribute('src','images/white.png')
+        cards[optionOneID].setAttribute('src','images/white.png')
+        cards[optionTwoID].removeEventListener('click', flipCard)
+        cards[optionOneID].removeEventListener('click', flipCard)
+        cardsWon.push(cardsChosen)
 
+    } else {
+        cards[optionOneID].setAttribute('src','images/blank.png')
+        cards[optionTwoID].setAttribute('src','images/blank.png')
+        alert('sorry, try again')
     }
-    
+
+    resultDisplay.textContent = cardsWon.length
+    cardsChosen = []
+    cardsChosenIds = []
+
+    if(cardsWon.length == cardArray.length/2){
+        resultDisplay.innerHTML = 'Congratulations you found them all.'
+    }
 }
 
 function flipCard(){
     const cardId = this.getAttribute('data-id');
     cardsChosen.push(cardArray[cardId].name);
     cardsChosenIds.push(cardId);
-    console.log(cardsChosen);
-    console.log(cardsChosenIds);
     this.setAttribute('src', cardArray[cardId].img)
-    
+
     if(cardsChosen.length === 2){
         setTimeout(checkMatch, 500);
     }
